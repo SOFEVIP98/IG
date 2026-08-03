@@ -38,7 +38,7 @@ claimBtn.onclick=async()=>{
    }
  }
 
- const snap=await getDocs(collection(db,"accounts"));
+ const snap=await getDocs(collection(db,"accounts","accounts","accounts"));
  if(snap.empty){
    result.style.display="block";
    result.innerHTML="❌ نفذت الحسابات، راجع لاحقًا.";
@@ -49,7 +49,7 @@ claimBtn.onclick=async()=>{
  const data=first.data();
 
  await setDoc(claimRef,{lastClaim:serverTimestamp()});
- await deleteDoc(doc(db,"accounts",first.id));
+ await deleteDoc(doc(db,"accounts","accounts","accounts",first.id));
 
  result.style.display="block";
  result.innerHTML=`👤 Username<br><b>${data.username}</b><br><br>🔑 Password<br><b>${data.password}</b>`;
