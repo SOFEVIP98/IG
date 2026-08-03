@@ -5,6 +5,8 @@ const claimBtn=document.getElementById("claimBtn");
 const status=document.getElementById("status");
 const result=document.getElementById("result");
 
+const WAIT=48*60*60*1000;
+
 loginBtn.onclick=async()=>{try{await signInWithPopup(auth,provider);}catch(e){alert(e.message);}};
 
 onAuthStateChanged(auth,u=>{
@@ -19,13 +21,17 @@ onAuthStateChanged(auth,u=>{
  }
 });
 
-let claimed=false;
 claimBtn.onclick=async()=>{
- if(claimed){alert("استلمت حساب بالفعل.");return;}
+ const last=localStorage.getItem("lastClaim");
+ if(last && Date.now()-Number(last)<WAIT){
+   result.style.display="block";
+   result.innerHTML="⏳ تقدر تستلم حساب جديد بعد مرور 48 ساعة.";
+   return;
+ }
  const snap=await getDocs(collection(db,"accounts"));
  if(snap.empty){
    result.style.display="block";
-   result.innerHTML="❌ نفذت الحسابات، راجعنا لاحقًا.";
+   result.innerHTML="❌ نفذت الحسابات، راجع لاحقًا.";
    return;
  }
  const first=snap.docs[0];
@@ -33,7 +39,7 @@ claimBtn.onclick=async()=>{
  result.style.display="block";
  result.innerHTML=`👤 Username<br><b>${data.username}</b><br><br>🔑 Password<br><b>${data.password}</b>`;
  await deleteDoc(doc(db,"accounts",first.id));
- claimed=true;
+ localStorage.setItem("lastClaim",Date.now().toString());
  claimBtn.disabled=true;
  claimBtn.textContent="تم الاستلام";
 };
